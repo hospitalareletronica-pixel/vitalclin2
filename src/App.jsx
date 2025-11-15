@@ -1,75 +1,34 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import { useAuth } from './context/AuthContext';
+import PacientesPage from './pages/PacientesPage';
+import AddPacientePage from './pages/AddPacientePage';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Failed to log out', error);
-    }
-  };
-
   return (
-    <div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          {currentUser ? (
-            <>
-              <li>
-                <span>{currentUser.email}</span>
-              </li>
-              <li>
-                <button onClick={handleLogout}>Logout</button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-              <li>
-                <Link to="/signup">Sign Up</Link>
-              </li>
-            </>
-          )}
-        </ul>
-      </nav>
-
-      <hr />
-
+    <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route
+          path="/"
+          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
+        />
+        <Route
+          path="/pacientes"
+          element={<PrivateRoute><PacientesPage /></PrivateRoute>}
+        />
+        <Route
+          path="/pacientes/novo"
+          element={<PrivateRoute><AddPacientePage /></PrivateRoute>}
+        />
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>
-    </div>
+    </Router>
   );
 }
 
-// We need to wrap App in a Router for useNavigate to work
-function AppWrapper() {
-  return (
-    <Router>
-      <App />
-    </Router>
-  )
-}
-
-export default AppWrapper;
+export default App;
